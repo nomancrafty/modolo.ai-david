@@ -5,5 +5,10 @@ services:
     build: .
     container_name: modolo-frontend
     ports:
-      - "5125:80"
+      - "5125:80"  # can keep internal port, Traefik will handle external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.modolo.rule=Host(`modolo.ai`)"
+      - "traefik.http.routers.modolo.entrypoints=websecure"
+      - "traefik.http.routers.modolo.tls.certresolver=myresolver"
     restart: always
