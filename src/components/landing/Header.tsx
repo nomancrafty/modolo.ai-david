@@ -19,11 +19,11 @@ const Header = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
+              <span className="text-lg font-bold text-primary-foreground">M</span>
+            </div>
             <span className="text-xl md:text-2xl font-bold text-foreground">
-              MODOLO AI
-            </span>
-            <span className="hidden sm:inline text-sm text-muted-foreground">
-              Technology
+              MODOLO.AI
             </span>
           </div>
 
@@ -61,7 +61,7 @@ const Header = () => {
               onClick={() => scrollToSection("cta")}
               className="gradient-primary text-primary-foreground shadow-soft hover:opacity-90 transition-opacity"
             >
-              Get Free AI Audit
+              Book Now
             </Button>
           </div>
 
@@ -110,7 +110,7 @@ const Header = () => {
                 onClick={() => scrollToSection("cta")}
                 className="gradient-primary text-primary-foreground shadow-soft w-full mt-2"
               >
-                Get Free AI Audit
+                Book Now
               </Button>
             </nav>
           </div>

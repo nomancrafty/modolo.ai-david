@@ -36,14 +36,16 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-2 lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl font-bold text-card-foreground">MODOLO AI</span>
-              <span className="text-sm text-muted-foreground">Technology</span>
+              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+                <span className="text-sm font-bold text-primary-foreground">M</span>
+              </div>
+              <span className="text-2xl font-bold text-card-foreground">MODOLO.AI</span>
             </div>
             <p className="text-muted-foreground mb-2 max-w-xs">
               Medical, Dental & Law Office AI Solutions
             </p>
             <p className="text-sm text-muted-foreground mb-6">
-              Medical Office, Dental Office & Law Office AI Technology Company
+              Demand Generation & AI Office Operations
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
@@ -114,7 +116,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} MODOLO AI Technology. All rights reserved.
+            © {currentYear} MODOLO.AI All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Medical, Dental & Law Office AI Solutions | www.aifordp.com
