@@ -23,7 +23,7 @@ const advertisingServices = [
     icon: Tv,
     title: "TV Advertising",
     description: "Local TV campaigns connected to AI call handling and booking.",
-    bullets: ["Local TV campaign setup", "Appointment booking from ads"],
+    bullets: ["Local TV campaign setup", "Appointment booking from ads", "Instant engagement with prospects"],
   },
   {
     icon: TrendingUp,
@@ -35,16 +35,16 @@ const advertisingServices = [
     icon: Instagram,
     title: "Facebook / Instagram Ads",
     description: "Automated lead qualification and follow-ups.",
-    bullets: ["Local audience targeting", "Offer & lead campaigns", "Automated follow-up & message handling"],
+    bullets: ["Local audience targeting", "Offer & lead campaigns", "Automated Follow-up & Message Handling"],
   },
 ];
 
 const marketingServices = [
   {
     icon: Award,
-    title: "Creative Assets Production",
+    title: "Practice Brand",
     description: "Build authority and trust in your local market.",
-    bullets: ["Brand positioning", "Reputation monitoring"],
+    bullets: ["Brand positioning", "Reputation monitoring", "Creative Assets Production"],
   },
   {
     icon: Share2,
@@ -56,7 +56,7 @@ const marketingServices = [
     icon: Search,
     title: "Search Optimization (SEO / AEO / GEO)",
     description: "Get found first on Google, Maps, and web search.",
-    bullets: ["Local SEO optimization", "Google Maps ranking", "Web search readiness"],
+    bullets: ["Local SEO optimization", "Google Maps ranking", "Voice with Web"],
   },
 ];
 
