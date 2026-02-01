@@ -42,16 +42,33 @@ const CTA = () => {
       return;
     }
 
-    // Send form data via email (temporary testing)
     try {
-      const mailtoLink = `mailto:david.golub@thrivemedia.marketing?subject=AI Readiness Consultation Request&body=First Name: ${formData.firstName}%0D%0ALast Name: ${formData.lastName}%0D%0ACompany: ${formData.companyName}%0D%0APhone: ${formData.phone}%0D%0AEmail: ${formData.email}%0D%0AMessage: ${formData.message}%0D%0ATransactional Consent: ${formData.transactionalConsent ? 'Yes' : 'No'}%0D%0AMarketing Consent: ${formData.marketingConsent ? 'Yes' : 'No'}`;
-      window.location.href = mailtoLink;
-      
-      setIsSubmitted(true);
-      toast({
-        title: "Consultation Request Received!",
-        description: "We'll be in touch within 24 hours.",
+      const response = await fetch("https://n8n.srv942069.hstgr.cloud/webhook/082b648b-0108-4b64-8172-ad2ceb309ece", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          companyName: formData.companyName,
+          phone: formData.phone,
+          email: formData.email,
+          message: formData.message,
+          transactionalConsent: formData.transactionalConsent,
+          marketingConsent: formData.marketingConsent,
+        }),
       });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+        toast({
+          title: "Consultation Request Received!",
+          description: "We'll be in touch within 24 hours.",
+        });
+      } else {
+        throw new Error("Failed to submit");
+      }
     } catch (error) {
       toast({
         title: "Something went wrong",
@@ -92,7 +109,7 @@ const CTA = () => {
 
             {/* Heading */}
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Book AI Readiness Consultation
+              Book AI Free Consultation
             </h2>
 
             <p className="text-xl font-medium text-primary mb-6">

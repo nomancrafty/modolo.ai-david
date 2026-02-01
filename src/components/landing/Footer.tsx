@@ -1,4 +1,5 @@
 import { Twitter, Linkedin, Facebook } from "lucide-react";
+import modoloLogo from "@/assets/modolo-logo.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -35,11 +36,8 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="col-span-2 lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-foreground">M</span>
-              </div>
-              <span className="text-2xl font-bold text-card-foreground">MODOLO.AI</span>
+            <div className="mb-4">
+              <img src={modoloLogo} alt="MODOLO AI Logo" className="h-24 md:h-30 w-auto" />
             </div>
             <p className="text-muted-foreground mb-2 max-w-xs">
               Medical, Dental & Law Office AI Solutions

@@ -25,7 +25,9 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-sm mb-8 animate-fade-in">
-            <span className="text-sm font-medium text-muted-foreground">Medical Office | Dental Office | Law Office | AI</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              <span className="font-bold text-primary">M</span>edical <span className="font-bold text-primary">O</span>ffice | <span className="font-bold text-primary">D</span>ental <span className="font-bold text-primary">O</span>ffice | <span className="font-bold text-primary">L</span>aw <span className="font-bold text-primary">O</span>ffice | AI
+            </span>
           </div>
 
           {/* Main Heading */}
