@@ -56,9 +56,8 @@ type Block =
   | {
       type: "versus";
       caption?: string;
-      source?: Source;
-      a: { label: string; value: string };
-      b: { label: string; value: string };
+      a: { label: string; value: string; source?: Source };
+      b: { label: string; value: string; source?: Source };
     }
   | { type: "verdict"; items: { status: "check" | "x"; tag: string; text: string }[] }
   | { type: "steps"; items: string[] };
@@ -238,12 +237,15 @@ const EXITS: Exit[] = [
       {
         type: "versus",
         caption: "Time to reply to a new website lead",
-        source: {
-          org: "Harvard Business Review, “The Short Life of Online Sales Leads”",
-          year: "2011",
-          url: "https://hbr.org/2011/03/the-short-life-of-online-sales-leads",
+        a: {
+          label: "The average business",
+          value: "42+ hours",
+          source: {
+            org: "Harvard Business Review, “The Short Life of Online Sales Leads”",
+            year: "2011",
+            url: "https://hbr.org/2011/03/the-short-life-of-online-sales-leads",
+          },
         },
-        a: { label: "The average business", value: "42+ hours" },
         b: { label: "Your AI employee", value: "Under 5 minutes" },
       },
       {
@@ -383,14 +385,15 @@ const EXITS: Exit[] = [
 function Cite({ source }: { source?: Source }) {
   if (!source) return null;
   const text = `Source — ${source.org}, ${source.year}`;
+  // Secondary to the statistic but comfortably readable: ~12px, warm grey.
   const base =
-    "mt-2.5 inline-block font-mono text-[0.625rem] leading-snug text-stone-soft max-w-[42ch]";
+    "mt-2.5 block font-sans text-[0.75rem] leading-relaxed text-stone-mid max-w-[46ch] text-balance";
   return source.url ? (
     <a
       href={source.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${base} underline decoration-dotted underline-offset-2 hover:text-coral-ink transition-colors`}
+      className={`${base} underline decoration-[hsl(var(--stone-mid)/0.5)] underline-offset-2 hover:text-coral-ink hover:decoration-coral-ink transition-colors`}
     >
       {text}
     </a>
@@ -486,13 +489,14 @@ function Callouts({ blocks }: { blocks: Block[] }) {
                   <div className="border-t border-[hsl(var(--ink)/0.12)] pt-3">
                     <p className="figure exit-cmp text-ink">{block.a.value}</p>
                     <p className="label text-stone-mid mt-2">{block.a.label}</p>
+                    <Cite source={block.a.source} />
                   </div>
                   <div className="border-t border-[hsl(var(--coral-ink)/0.5)] pt-3">
                     <p className="figure exit-cmp text-coral-ink">{block.b.value}</p>
                     <p className="label text-stone-mid mt-2">{block.b.label}</p>
+                    <Cite source={block.b.source} />
                   </div>
                 </div>
-                <Cite source={block.source} />
               </div>
             );
 

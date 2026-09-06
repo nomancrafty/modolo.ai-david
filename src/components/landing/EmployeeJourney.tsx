@@ -1,29 +1,24 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { prefersReducedMotion } from "@/hooks/useMotion";
 
 /* ============================================================
    EmployeeJourney — the seven-stage system line.
 
-   A compact, sticky progress rail over the seven exits. On first view it plays
-   a one-time 01 → 07 introduction so the whole system reads as "working," then
-   hands off to the reader: as chapters scroll through the viewport the active
-   stage follows, and hovering / focusing / clicking a stage takes over
-   immediately (and navigates on click). Completed stages carry a check, the
-   active stage a coral ring + slight scale, upcoming stages stay neutral — so
-   state never rests on colour alone. All timers and observers are cleaned up,
-   ticks pause when the tab is hidden, and reduced-motion skips the sequence
-   entirely while keeping every state and control intact.
-
-   No animation dependency: CSS transitions + IntersectionObserver only.
+   A compact rail (sticky on md+) over the seven exits. There is NO autoplay
+   and NO decorative sequence: a single `active` index, derived purely from the
+   reading position just below the sticky header + rail, is the one source of
+   truth for the active/completed/upcoming nodes, the orange progress width and
+   the breadcrumb. It is computed on mount (so a refresh mid-page is correct),
+   after fonts settle, and on scroll/resize (rAF-throttled). Clicking a node
+   smooth-scrolls to its section; the same scroll-derived state then keeps the
+   node and breadcrumb in sync. Reduced motion keeps every state, drops motion.
    ============================================================ */
 
 export type JourneyStage = { n: string; name: string };
 
-/** Fixed header height; anchor scrolls clear it (plus the sticky rail on md+). */
+/** Fixed header height; the sticky rail sits directly beneath it on md+. */
 const HEADER_H = 88;
-const STEP_MS = 1000; // ~900–1200ms per stage during the intro
-const HOLD_MS = 1150; // pause on 07 before handing off
 
 export default function EmployeeJourney({
   stages,
@@ -32,134 +27,68 @@ export default function EmployeeJourney({
 }) {
   const count = stages.length;
   const [active, setActive] = useState(0);
-  const [snap, setSnap] = useState(false); // one update with no line transition
 
-  const railRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const btnRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
-  const introTimer = useRef<number | null>(null);
-  const holdTimer = useRef<number | null>(null);
-  const introStarted = useRef(false);
-  const introDone = useRef(false);
-  const visible = useRef(false);
-  const hovered = useRef<number | null>(null);
-  const scrollActive = useRef(0);
-  // While a click's smooth-scroll is in flight, ignore scroll-spy updates so the
-  // clicked target isn't clobbered by intermediate reading-line picks.
-  const lockUntil = useRef(0);
-
   const reduce =
     typeof window !== "undefined" ? prefersReducedMotion() : false;
 
-  const chapterEl = useCallback(
-    (i: number) => document.getElementById(`exit-${stages[i]?.n}`),
-    [stages]
-  );
-
-  const clearIntro = useCallback(() => {
-    if (introTimer.current !== null) {
-      window.clearInterval(introTimer.current);
-      introTimer.current = null;
-    }
-    if (holdTimer.current !== null) {
-      window.clearTimeout(holdTimer.current);
-      holdTimer.current = null;
-    }
-    introDone.current = true;
-  }, []);
-
-  // Hand the rail over to the reading position without animating the rewind.
-  const finishIntro = useCallback(() => {
-    introDone.current = true;
-    setSnap(true);
-    setActive(scrollActive.current);
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => setSnap(false))
-    );
-  }, []);
-
-  // --- Effect: observers + intro sequence, all cleaned up on unmount ---
+  // --- Single source of truth: active exit derived from the reading position ---
   useEffect(() => {
-    const chapters = stages
-      .map((_, i) => chapterEl(i))
-      .filter((el): el is HTMLElement => !!el);
+    const sectionFor = (i: number) =>
+      document.getElementById(`exit-${stages[i]?.n}`);
 
-    // Scroll-spy: the active chapter is the last one whose top has passed a
-    // reading line ~45% down the viewport. Rects are read only on the
-    // observer's (infrequent) boundary callbacks, never on a scroll loop, and
-    // the measure is independent of each chapter's height.
-    const commitScroll = (i: number) => {
-      if (Date.now() < lockUntil.current) return; // a click is settling
-      scrollActive.current = i;
-      if ((introDone.current || reduce) && hovered.current === null) {
-        setActive(i);
-      }
-    };
-    const pick = () => {
-      const line = window.innerHeight * 0.45;
+    let raf = 0;
+    const compute = () => {
+      raf = 0;
+      // Reading line sits just below the sticky header + rail. When the rail is
+      // pinned its bottom is ~header+railHeight; when it is not yet pinned (or
+      // has scrolled away) fall back to the header height.
+      const rect = barRef.current?.getBoundingClientRect();
+      const navBottom = rect ? rect.bottom : HEADER_H;
+      // Reading line sits a little below the rail — enough that a section counts
+      // as active the moment its heading tucks under the rail, rather than only
+      // once its top has scrolled well past it (which left the previous exit
+      // marked active while the next one filled the screen).
+      const readingY = Math.max(navBottom, HEADER_H) + 96;
+
       let idx = 0;
-      for (let i = 0; i < chapters.length; i++) {
-        if (chapters[i].getBoundingClientRect().top <= line) idx = i;
-        else break;
+      for (let i = 0; i < count; i++) {
+        const el = sectionFor(i);
+        if (el && el.getBoundingClientRect().top <= readingY) idx = i;
       }
-      return idx;
-    };
-    const spy = new IntersectionObserver(() => commitScroll(pick()), {
-      rootMargin: "-45% 0px -50% 0px",
-      threshold: [0, 1],
-    });
-    chapters.forEach((c) => spy.observe(c));
-
-    // Intro: start once when the rail is first well in view.
-    const startIntro = () => {
-      if (introStarted.current || reduce) return;
-      introStarted.current = true;
-      setActive(0);
-      let k = 0;
-      introTimer.current = window.setInterval(() => {
-        if (document.hidden || !visible.current) return; // pause off-screen/hidden
-        k += 1;
-        if (k >= count - 1) {
-          setActive(count - 1);
-          if (introTimer.current !== null) {
-            window.clearInterval(introTimer.current);
-            introTimer.current = null;
-          }
-          holdTimer.current = window.setTimeout(finishIntro, HOLD_MS);
-          return;
-        }
-        setActive(k);
-      }, STEP_MS);
+      setActive((prev) => (prev === idx ? prev : idx));
     };
 
-    const railObs = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          visible.current = e.isIntersecting;
-          if (e.isIntersecting) startIntro();
-        }
-      },
-      { threshold: 0.4 }
-    );
-    if (railRef.current) railObs.observe(railRef.current);
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(compute);
+    };
 
-    // Reduced motion: no sequence — settle straight onto the reading position.
-    if (reduce) {
-      introDone.current = true;
+    compute(); // on mount — correct after a mid-page refresh
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    // Recompute once layout/fonts have settled (heights can shift the reading line).
+    const settle = window.setTimeout(compute, 350);
+    let cancelled = false;
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      document.fonts.ready.then(() => {
+        if (!cancelled) compute();
+      });
     }
 
     return () => {
-      spy.disconnect();
-      railObs.disconnect();
-      if (introTimer.current !== null) window.clearInterval(introTimer.current);
-      if (holdTimer.current !== null) window.clearTimeout(holdTimer.current);
+      cancelled = true;
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      window.clearTimeout(settle);
+      if (raf) cancelAnimationFrame(raf);
     };
-  }, [stages, count, reduce, chapterEl, finishIntro]);
+  }, [stages, count]);
 
-  // Keep the active stage scrolled into view within the horizontal track
-  // (mobile), never moving the page itself.
+  // Keep the active node scrolled into view within the horizontal track
+  // (mobile), without moving the page itself.
   useEffect(() => {
     const track = trackRef.current;
     const btn = btnRefs.current[active];
@@ -173,50 +102,22 @@ export default function EmployeeJourney({
     }
   }, [active, reduce]);
 
-  // --- Interaction ---
-  const emphasize = (i: number) => {
-    clearIntro();
-    hovered.current = i;
-    setActive(i);
-  };
-  const release = () => {
-    hovered.current = null;
-    setActive(scrollActive.current);
-  };
+  // Click: scroll to the section; scroll-margin-top clears the header + rail,
+  // and the scroll-derived state above keeps `active` in sync afterwards.
   const goTo = (i: number) => {
-    clearIntro();
-    hovered.current = null;
-    scrollActive.current = i;
-    lockUntil.current = Date.now() + (reduce ? 0 : 1000);
     setActive(i);
-    const el = chapterEl(i);
-    if (!el) return;
-    const stickyH =
-      typeof window !== "undefined" &&
-      window.matchMedia("(min-width: 768px)").matches &&
-      barRef.current
-        ? barRef.current.offsetHeight
-        : 0;
-    const y =
-      el.getBoundingClientRect().top +
-      window.scrollY -
-      HEADER_H -
-      stickyH -
-      12;
-    window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
+    const el = document.getElementById(`exit-${stages[i]?.n}`);
+    el?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   };
 
-  // One continuous base track runs from node-1 centre (railInsetPct) to
-  // node-7 centre. The orange overlay starts at that same left edge and its
-  // right edge lands exactly on the active node's centre: for node i the centre
-  // sits at (i + 0.5)/count, and railInsetPct + progressPct resolves to the
-  // same value — i.e. progress along the track is activeIndex / (count - 1),
-  // giving 0% / 16.667% / … / 100% for Exits 1–7.
+  // One continuous base track (node-1 centre → node-7 centre). The orange
+  // overlay's right edge lands exactly on the active node's centre:
+  // progress along the track = activeIndex / (count - 1) → 0 / 16.6 / … / 100%.
   const railInsetPct = count > 1 ? 50 / count : 0;
   const progressPct = count > 1 ? (active / count) * 100 : 0;
 
   return (
-    <div ref={railRef} className="md:sticky md:top-[88px] z-40">
+    <div className="md:sticky md:top-[88px] z-40">
       <div
         ref={barRef}
         className="border-y border-[hsl(var(--ink)/0.08)] bg-[hsl(var(--surface)/0.82)] backdrop-blur-md shadow-[0_12px_32px_-28px_hsl(var(--ink)/0.35)]"
@@ -238,9 +139,9 @@ export default function EmployeeJourney({
               style={{
                 left: `${railInsetPct}%`,
                 width: `${progressPct}%`,
-                transition: snap
+                transition: reduce
                   ? "none"
-                  : "width 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+                  : "width 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
               }}
             />
 
@@ -261,13 +162,9 @@ export default function EmployeeJourney({
                       }}
                       type="button"
                       onClick={() => goTo(i)}
-                      onMouseEnter={() => emphasize(i)}
-                      onMouseLeave={release}
-                      onFocus={() => emphasize(i)}
-                      onBlur={release}
                       aria-label={`Go to Exit ${s.n} — ${s.name}`}
                       aria-current={state === "active" ? "step" : undefined}
-                      className="group/stage flex flex-col items-center gap-2.5 px-2 pt-0 pb-0 min-h-[44px]"
+                      className="group/stage flex flex-col items-center gap-2.5 px-2 min-h-[44px]"
                     >
                       <span
                         className={[
@@ -300,8 +197,8 @@ export default function EmployeeJourney({
             </ol>
           </div>
 
-          {/* Textual active indicator — keeps state legible without relying on
-              colour, and names the current employee on narrow screens. */}
+          {/* Breadcrumb — same `active` source, so it can never disagree with
+              the nodes. */}
           <p className="label text-stone-mid mt-4 text-center md:text-left">
             <span className="text-coral-ink">Exit {stages[active]?.n}</span>
             <span className="mx-2 text-stone-soft" aria-hidden="true">
