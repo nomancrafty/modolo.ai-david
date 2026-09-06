@@ -13,15 +13,17 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const ref = useReveal<HTMLDivElement>({ threshold: 0.1, stagger: 40 });
 
+  // The seven services, in Exit order, each linking to its chapter (#exit-N).
+  const services = [
+    { label: "The AI Website", href: "#exit-1" },
+    { label: "Database Reactivation", href: "#exit-2" },
+    { label: "Reviews & Referrals", href: "#exit-3" },
+    { label: "Website Lead Nurturing", href: "#exit-4" },
+    { label: "AI Receptionist", href: "#exit-5" },
+    { label: "AI Sales Coach", href: "#exit-6" },
+    { label: "Paid Ads + AI Nurturing", href: "#exit-7" },
+  ];
   const links = {
-    // The old #features section was removed; these keep their wording and now
-    // point at the seven-employee solutions section (#employees).
-    solutions: [
-      { label: "AI Voice Receptionist", href: "#employees" },
-      { label: "Calendar Management", href: "#employees" },
-      { label: "Review Management", href: "#employees" },
-      { label: "SEO & Advertising", href: "#employees" },
-    ],
     // "How It Works" removed with its section; no confirmed destination yet.
     company: [
       { label: "About Us", href: "#" },
@@ -96,11 +98,32 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Link columns */}
-          <nav className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-12" aria-label="Footer">
+          {/* Link columns — Services (all seven) spans two sub-columns so the
+              longer list stays balanced against Company and Legal. */}
+          <nav
+            className="md:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12"
+            aria-label="Footer"
+          >
+            <div className="col-span-2">
+              <h4 className="label text-ink pb-4 mb-2 border-b border-ink">
+                Services
+              </h4>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                {services.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="block py-2.5 text-[0.9375rem] text-stone-mid hover:text-coral-ink transition-colors duration-300"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             {(
               [
-                ["Solutions", links.solutions],
                 ["Company", links.company],
                 ["Legal", links.legal],
               ] as const

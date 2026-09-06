@@ -46,6 +46,9 @@ export default function EmployeeJourney({
   const visible = useRef(false);
   const hovered = useRef<number | null>(null);
   const scrollActive = useRef(0);
+  // While a click's smooth-scroll is in flight, ignore scroll-spy updates so the
+  // clicked target isn't clobbered by intermediate reading-line picks.
+  const lockUntil = useRef(0);
 
   const reduce =
     typeof window !== "undefined" ? prefersReducedMotion() : false;
@@ -88,6 +91,7 @@ export default function EmployeeJourney({
     // observer's (infrequent) boundary callbacks, never on a scroll loop, and
     // the measure is independent of each chapter's height.
     const commitScroll = (i: number) => {
+      if (Date.now() < lockUntil.current) return; // a click is settling
       scrollActive.current = i;
       if ((introDone.current || reduce) && hovered.current === null) {
         setActive(i);
@@ -182,6 +186,8 @@ export default function EmployeeJourney({
   const goTo = (i: number) => {
     clearIntro();
     hovered.current = null;
+    scrollActive.current = i;
+    lockUntil.current = Date.now() + (reduce ? 0 : 1000);
     setActive(i);
     const el = chapterEl(i);
     if (!el) return;
@@ -200,8 +206,14 @@ export default function EmployeeJourney({
     window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
   };
 
-  const progressPct = count > 1 ? (active / count) * 100 : 0;
+  // One continuous base track runs from node-1 centre (railInsetPct) to
+  // node-7 centre. The orange overlay starts at that same left edge and its
+  // right edge lands exactly on the active node's centre: for node i the centre
+  // sits at (i + 0.5)/count, and railInsetPct + progressPct resolves to the
+  // same value — i.e. progress along the track is activeIndex / (count - 1),
+  // giving 0% / 16.667% / … / 100% for Exits 1–7.
   const railInsetPct = count > 1 ? 50 / count : 0;
+  const progressPct = count > 1 ? (active / count) * 100 : 0;
 
   return (
     <div ref={railRef} className="md:sticky md:top-[88px] z-40">
@@ -228,7 +240,7 @@ export default function EmployeeJourney({
                 width: `${progressPct}%`,
                 transition: snap
                   ? "none"
-                  : "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
+                  : "width 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
               }}
             />
 

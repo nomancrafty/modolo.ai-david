@@ -27,21 +27,36 @@ import EmployeeJourney from "./EmployeeJourney";
    All copy is the client's, verbatim.
    ============================================================ */
 
-/** One panel block on the right of a chapter. */
+/** A citation for a statistic: organisation + year, linking to the most
+    authoritative available source. `url` omitted when only a named attribution
+    (no primary link) is available. */
+type Source = { org: string; year: string; url?: string };
+
+/** One panel block on the right of a chapter. `source` keeps citations in the
+    data, next to the number they belong to, rather than scattered in JSX. */
 type Block =
   | { type: "lead"; text: string }
   | { type: "note"; text: string }
-  | { type: "stats"; big?: boolean; items: { value: string; label: string }[] }
-  | { type: "stack"; items: string[] }
+  | {
+      type: "stats";
+      items: {
+        value: string;
+        label: string;
+        accent?: boolean;
+        source?: Source;
+      }[];
+    }
   | {
       type: "bars";
       caption?: string;
       max?: number;
+      source?: Source;
       items: { label: string; value: number; display: string }[];
     }
   | {
       type: "versus";
       caption?: string;
+      source?: Source;
       a: { label: string; value: string };
       b: { label: string; value: string };
     }
@@ -79,24 +94,34 @@ const EXITS: Exit[] = [
       "Exit one closes, and the traffic they already have finally makes it through.",
     ],
     blocks: [
-      { type: "stack", items: ["No offer.", "No form.", "Nothing to click."] },
+      { type: "lead", text: "No offer. No form. Nothing to click." },
       {
         type: "stats",
         items: [
           {
             value: "53%",
-            label: "are gone in 3 seconds — before the door even opens (Google)",
+            label: "are gone in 3 seconds — before the door even opens",
+            source: {
+              org: "Google/SOASTA Research",
+              year: "2017",
+              url: "https://www.thinkwithgoogle.com/marketing-strategies/app-and-mobile/mobile-page-speed-new-industry-benchmarks/",
+            },
           },
         ],
       },
-      { type: "note", text: "Chance of losing the driver as load time grows" },
+      { type: "note", text: "Bounce probability climbs as mobile load time grows" },
       {
         type: "bars",
-        caption: "Bounce probability vs. a 1-second load — Google/SOASTA",
+        caption: "Probability of bounce vs. a 1-second load",
+        source: {
+          org: "Google/SOASTA Research",
+          year: "2017",
+          url: "https://www.thinkwithgoogle.com/marketing-strategies/app-and-mobile/mobile-page-speed-new-industry-benchmarks/",
+        },
         items: [
-          { label: "1 second", value: 32, display: "32" },
-          { label: "2 seconds", value: 90, display: "90" },
-          { label: "3 seconds", value: 123, display: "123" },
+          { label: "3 seconds", value: 32, display: "+32%" },
+          { label: "5 seconds", value: 90, display: "+90%" },
+          { label: "10 seconds", value: 123, display: "+123%" },
         ],
       },
     ],
@@ -161,7 +186,15 @@ const EXITS: Exit[] = [
       {
         type: "stats",
         items: [
-          { value: "98%", label: "of prospects reference reviews before they buy" },
+          {
+            value: "98%",
+            label: "of prospects reference reviews before they buy",
+            source: {
+              org: "BrightLocal Local Consumer Review Survey",
+              year: "2024",
+              url: "https://www.brightlocal.com/research/local-consumer-review-survey-2024/",
+            },
+          },
           { value: "11%", label: "of businesses ever ask for one" },
         ],
       },
@@ -205,8 +238,13 @@ const EXITS: Exit[] = [
       {
         type: "versus",
         caption: "Time to reply to a new website lead",
+        source: {
+          org: "Harvard Business Review, “The Short Life of Online Sales Leads”",
+          year: "2011",
+          url: "https://hbr.org/2011/03/the-short-life-of-online-sales-leads",
+        },
         a: { label: "The average business", value: "42+ hours" },
-        b: { label: "Your AI employee", value: "under 5 minutes" },
+        b: { label: "Your AI employee", value: "Under 5 minutes" },
       },
       {
         type: "stats",
@@ -239,8 +277,13 @@ const EXITS: Exit[] = [
       { type: "lead", text: "Every call picked up — 24/7." },
       {
         type: "stats",
-        big: true,
-        items: [{ value: "62%", label: "of calls to local businesses go unanswered" }],
+        items: [
+          {
+            value: "62%",
+            label: "of calls to local businesses go unanswered",
+            source: { org: "411 Locals missed-call study", year: "2024" },
+          },
+        ],
       },
       {
         type: "note",
@@ -335,6 +378,27 @@ const EXITS: Exit[] = [
 
 /* ---------- Panel blocks ---------- */
 
+/** A subtle, readable citation shown beneath a statistic. Links open safely in
+    a new tab; text-only when no authoritative link is available. */
+function Cite({ source }: { source?: Source }) {
+  if (!source) return null;
+  const text = `Source — ${source.org}, ${source.year}`;
+  const base =
+    "mt-2.5 inline-block font-mono text-[0.625rem] leading-snug text-stone-soft max-w-[42ch]";
+  return source.url ? (
+    <a
+      href={source.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${base} underline decoration-dotted underline-offset-2 hover:text-coral-ink transition-colors`}
+    >
+      {text}
+    </a>
+  ) : (
+    <span className={base}>{text}</span>
+  );
+}
+
 function Callouts({ blocks }: { blocks: Block[] }) {
   return (
     <div className="space-y-8">
@@ -363,10 +427,8 @@ function Callouts({ blocks }: { blocks: Block[] }) {
                 {block.items.map((s) => (
                   <div key={s.label}>
                     <p
-                      className={`figure text-ink leading-none ${
-                        block.big
-                          ? "text-[3rem] md:text-[3.5rem]"
-                          : "text-[2rem] md:text-[2.25rem]"
+                      className={`figure exit-stat leading-none ${
+                        s.accent ? "text-coral-ink" : "text-ink"
                       }`}
                     >
                       {s.value}
@@ -374,25 +436,8 @@ function Callouts({ blocks }: { blocks: Block[] }) {
                     <p className="label text-stone-mid mt-2.5 leading-[1.6]">
                       {s.label}
                     </p>
+                    <Cite source={s.source} />
                   </div>
-                ))}
-              </div>
-            );
-
-          case "stack":
-            return (
-              <div key={i} className="rv space-y-2.5">
-                {block.items.map((t) => (
-                  <p
-                    key={t}
-                    className="display-sm !text-[1.125rem] md:!text-[1.375rem] text-ink flex items-center gap-3"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="w-[6px] h-[6px] rotate-45 bg-coral shrink-0"
-                    />
-                    {t}
-                  </p>
                 ))}
               </div>
             );
@@ -424,30 +469,30 @@ function Callouts({ blocks }: { blocks: Block[] }) {
                     </div>
                   ))}
                 </div>
+                <Cite source={block.source} />
               </div>
             );
           }
 
           case "versus":
+            // Stacked so both values get equal treatment and long phrases like
+            // "Under 5 minutes" never wrap into the divider or collide.
             return (
               <div key={i} className="rv">
                 {block.caption && (
                   <p className="label text-stone-mid mb-4">{block.caption}</p>
                 )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                  <div className="border-t border-rule pt-4">
-                    <p className="figure text-[1.5rem] md:text-[1.75rem] text-ink leading-none">
-                      {block.a.value}
-                    </p>
-                    <p className="label text-stone-mid mt-2.5">{block.a.label}</p>
+                <div className="space-y-4">
+                  <div className="border-t border-[hsl(var(--ink)/0.12)] pt-3">
+                    <p className="figure exit-cmp text-ink">{block.a.value}</p>
+                    <p className="label text-stone-mid mt-2">{block.a.label}</p>
                   </div>
-                  <div className="border-t border-coral-ink pt-4">
-                    <p className="figure text-[1.5rem] md:text-[1.75rem] text-coral-ink leading-none">
-                      {block.b.value}
-                    </p>
-                    <p className="label text-stone-mid mt-2.5">{block.b.label}</p>
+                  <div className="border-t border-[hsl(var(--coral-ink)/0.5)] pt-3">
+                    <p className="figure exit-cmp text-coral-ink">{block.b.value}</p>
+                    <p className="label text-stone-mid mt-2">{block.b.label}</p>
                   </div>
                 </div>
+                <Cite source={block.source} />
               </div>
             );
 
@@ -519,7 +564,7 @@ function Chapter({ e }: { e: Exit }) {
     <li
       ref={ref}
       id={`exit-${e.n}`}
-      className="scroll-mt-[152px] md:scroll-mt-[176px]"
+      className="scroll-mt-[110px] md:scroll-mt-[236px]"
     >
       {/* Open editorial chapter: a thin rule for grouping, no enclosing box. */}
       <div className="grid gap-x-12 gap-y-10 md:grid-cols-12 border-t border-[hsl(var(--ink)/0.12)] pt-[clamp(2rem,4vw,3rem)]">
@@ -527,9 +572,7 @@ function Chapter({ e }: { e: Exit }) {
         <div className="rv md:col-span-3">
           <div className="flex items-baseline gap-3 mb-4">
             <span className="label text-stone-mid">Exit</span>
-            <span className="figure text-[3rem] md:text-[3.5rem] leading-none text-coral">
-              {e.n}
-            </span>
+            <span className="figure exit-num leading-none text-coral">{e.n}</span>
           </div>
           <div className="flex items-center gap-2.5 mb-3">
             <Icon

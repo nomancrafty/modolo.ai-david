@@ -492,6 +492,14 @@
     line-height: 1.1;
   }
 
+  /* ---------- Seven-exit typography scale ----------
+     One responsive scale each for the big exit number, the large statistics
+     (53%, 98%, 400%, 62%, 70%, 85%, …) and the text comparison values, so no
+     exit hardcodes its own size and all seven read as one system. */
+  .exit-num { font-size: clamp(2.5rem, 4.5vw, 3.5rem); }
+  .exit-stat { font-size: clamp(1.875rem, 2.4vw, 2.375rem); }
+  .exit-cmp { font-size: clamp(1.375rem, 1.9vw, 1.625rem); line-height: 1.1; }
+
   /* Section eyebrow: the mono label with a small coral tick before it. */
   .eyebrow {
     display: inline-flex;
