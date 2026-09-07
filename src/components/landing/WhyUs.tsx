@@ -5,12 +5,12 @@ import { useReveal } from "@/hooks/useMotion";
    with a stable heading on the left and six compact rows on the right. */
 
 const reasons = [
-  "Built specifically for medical clinics, dental practices & law offices",
-  "Compliance-ready for regulated industries (healthcare & legal workflows)",
+  "Built specifically for medical clinics & dental practices",
+  "Compliance-ready for regulated healthcare workflows",
   "No long-term contracts",
   "Results typically in 2–4 weeks",
   "Human-like AI conversations for patients & clients",
-  "Works for appointments, consultations & case inquiries",
+  "Works for appointments, consultations & new-patient inquiries",
 ];
 
 const WhyUs = () => {
@@ -37,7 +37,7 @@ const WhyUs = () => {
           <div className="md:col-span-5">
             <p className="rv eyebrow label text-stone-mid mb-8">Why MODOLO AI</p>
             <h2 className="rv-wipe display-lg !text-[clamp(2rem,4.8vw,3.7rem)] text-ink md:sticky md:top-32">
-              Why Medical, Dental &amp; Law Offices Choose MODOLO AI Technology
+              Why Medical &amp; Dental Offices Choose MODOLO AI Technology
             </h2>
           </div>
 

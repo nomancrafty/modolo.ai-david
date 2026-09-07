@@ -78,7 +78,7 @@ const Footer = () => {
               className="h-14 w-auto mb-7"
             />
             <p className="text-[1.0625rem] text-ink mb-1.5">
-              Medical, Dental &amp; Law Office AI Solutions
+              Medical &amp; Dental Office AI Solutions
             </p>
             <p className="label text-stone-mid mb-9">
               Demand Generation &amp; AI Office Operations
@@ -155,7 +155,7 @@ const Footer = () => {
             © {currentYear} MODOLO.AI All rights reserved.
           </p>
           <p className="label text-stone-mid">
-            Medical, Dental &amp; Law Office AI Solutions
+            Medical &amp; Dental Office AI Solutions
             <span className="text-stone-mid mx-2" aria-hidden="true">/</span>
             www.modolo.ai
           </p>

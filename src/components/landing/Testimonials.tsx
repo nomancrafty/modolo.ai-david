@@ -15,14 +15,14 @@ const testimonials = [
   },
   {
     name: "JL",
-    role: "Regional Healthcare & Legal Services Group",
+    role: "Regional Healthcare Services Group",
     content: "Our Google reviews exploded and new patients and clients trust us instantly.",
     metric: "+1.1 star rating in 60 days",
     featured: false,
   },
   {
     name: "DG",
-    role: "Multi-location Medical, Dental & Law Office Network",
+    role: "Multi-location Medical & Dental Office Network",
     content: "Ad costs dropped while lead quality went up across all departments.",
     metric: "42% lower cost per qualified lead",
     featured: false,
@@ -63,7 +63,7 @@ const Testimonials = () => {
         <div ref={head} className="mb-[clamp(2.5rem,6vw,4rem)] max-w-4xl">
           <p className="rv eyebrow label text-stone-mid mb-8">Real Results</p>
           <h2 className="rv-wipe display-lg text-ink">
-            Real Results From Medical, Dental &amp; Law Offices
+            Real Results From Medical &amp; Dental Offices
           </h2>
         </div>
 

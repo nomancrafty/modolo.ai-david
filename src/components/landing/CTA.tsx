@@ -376,7 +376,7 @@ const CTA = () => {
           <div className="relative mt-[clamp(3.5rem,8vw,6rem)] pt-14 border-t border-ink grid gap-x-16 gap-y-10 md:grid-cols-12 items-end">
             <div className="md:col-span-8">
               <h3 className="display-md text-on-ink mb-5 rv">
-                Ready to Grow Your Medical, Dental or Law Practice?
+                Ready to Grow Your Medical or Dental Practice?
               </h3>
               <p className="prose-body rv">
                 Every day without AI is another day patients and clients book with

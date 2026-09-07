@@ -83,8 +83,6 @@ const Hero = () => {
           Medical
           <span className="text-stone-soft mx-2.5" aria-hidden="true">|</span>
           Dental
-          <span className="text-stone-soft mx-2.5" aria-hidden="true">|</span>
-          Law
         </p>
 
         {/* Headline — constrained so the two messages stay a composed block */}
@@ -126,10 +124,10 @@ const Hero = () => {
         {/* Trust proof beneath the CTA group — four columns, restrained divider */}
         <div className="w-full mt-[clamp(3rem,7vw,5rem)] pt-[clamp(1.75rem,3.5vw,2.5rem)] border-t border-[hsl(var(--ink)/0.08)]">
           <p className="label text-stone-mid mb-7 rv">
-            Trusted by leading medical, dental, and law offices
+            Trusted by leading medical and dental offices
           </p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-8">
-            <Stat value={150} suffix="+" label="Medical, Dental & Law Offices" />
+            <Stat value={150} suffix="+" label="Medical & Dental Offices" />
             <Stat value={1.8} decimals={1} suffix="M+" label="Patient Interactions" />
             <Stat value={22} suffix="+" label="Years Healthcare Tech" />
             <Stat value={4.9} decimals={1} suffix="★" label="Average Client Rating" />
