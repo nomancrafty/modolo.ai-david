@@ -152,6 +152,7 @@ function Card({ t }: { t: Testimonial }) {
 
 const Testimonials = () => {
   const head = useReveal<HTMLDivElement>({ threshold: 0.2, stagger: 70 });
+  const carouselReveal = useReveal<HTMLDivElement>({ threshold: 0.12 });
   const reduce =
     typeof window !== "undefined" ? prefersReducedMotion() : false;
 
@@ -245,6 +246,7 @@ const Testimonials = () => {
 
         {/* Carousel */}
         <div
+          ref={carouselReveal}
           className="rv"
           role="region"
           aria-roledescription="carousel"
