@@ -85,20 +85,17 @@ const Hero = () => {
           Dental
         </p>
 
-        {/* Headline — constrained so the two messages stay a composed block */}
-        <h1 className="hero-title mx-auto max-w-[64rem] mt-[clamp(1.5rem,3vw,2.25rem)] text-balance">
-          <span className="rv-wipe block text-ink">
-            Acquire More Patients &amp; Clients
-          </span>
-          <span className="rv-wipe block text-coral mt-2 md:mt-3">
-            Eliminate Manual Work &amp; Waste
-          </span>
+        {/* Headline — one composed sentence; the value phrase carries the
+            orange accent, the rest stays dark. Balanced wrapping avoids orphans. */}
+        <h1 className="hero-title rv-wipe mx-auto max-w-[60rem] mt-[clamp(1.5rem,3vw,2.25rem)] text-balance text-ink">
+          Acquire more patients and{" "}
+          <span className="text-coral">stop the revenue leakages</span>{" "}
+          that you already have
         </h1>
 
-        {/* Supporting group: paragraph, prompt and CTAs read as one unit */}
-        <p className="prose-body rv mx-auto !max-w-[42rem] mt-[clamp(1.5rem,3vw,2.25rem)] text-pretty">
-          Every day without AI, competitors win clients while your team loses
-          time to repetitive work.
+        {/* Supporting group: subheadline, prompt and CTAs read as one unit */}
+        <p className="prose-body rv mx-auto !max-w-[44rem] mt-[clamp(1.5rem,3vw,2.25rem)] text-pretty">
+          One unified AI system for your practice - seven AI employees, no leaks.
         </p>
 
         <p className="rv mt-7 text-[1.0625rem] font-medium text-stone-mid">
