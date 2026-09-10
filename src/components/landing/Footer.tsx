@@ -1,26 +1,32 @@
 import { Twitter, Linkedin, Facebook } from "lucide-react";
-import modoloLogo from "@/assets/modolo-logo.png";
-import { SteadyTrace } from "./VitalTrace";
-import { useReveal, useScrollProgress } from "@/hooks/useMotion";
+import { useReveal } from "@/hooks/useMotion";
 
-/* Copy unchanged. The trace across the top is the narrative's last beat:
-   every leak sealed, the practice reading steady. */
+// New MODOLO AI logo, served from /public (intrinsic 2546×1664). `h-14 w-auto`
+// renders it and preserves aspect ratio; the attrs carry the intrinsic ratio.
+const LOGO_SRC = "/favicon.png";
+
+/* Copy unchanged. The old heartbeat trace across the top has been retired
+   with the rest of the pulse identity; the section now opens on the same
+   clean rule-and-diamond divider used between chapters. */
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const ref = useReveal<HTMLDivElement>({ threshold: 0.1, stagger: 40 });
-  const flowRef = useScrollProgress<HTMLDivElement>("--p", { start: 0.95, end: 0.55 });
 
+  // The seven services, in Exit order, each linking to its chapter (#exit-N).
+  const services = [
+    { label: "The AI Website", href: "#exit-1" },
+    { label: "Database Reactivation", href: "#exit-2" },
+    { label: "Reviews & Referrals", href: "#exit-3" },
+    { label: "Website Lead Nurturing", href: "#exit-4" },
+    { label: "AI Receptionist", href: "#exit-5" },
+    { label: "AI Sales Coach", href: "#exit-6" },
+    { label: "Paid Ads + AI Nurturing", href: "#exit-7" },
+  ];
   const links = {
-    solutions: [
-      { label: "AI Voice Receptionist", href: "#features" },
-      { label: "Calendar Management", href: "#features" },
-      { label: "Review Management", href: "#features" },
-      { label: "SEO & Advertising", href: "#features" },
-    ],
+    // "How It Works" removed with its section; no confirmed destination yet.
     company: [
       { label: "About Us", href: "#" },
-      { label: "How It Works", href: "#how-it-works" },
       { label: "Results", href: "#testimonials" },
       { label: "Contact", href: "#cta" },
     ],
@@ -38,24 +44,41 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-paper pt-[clamp(3rem,7vw,5rem)] pb-14">
-      <div ref={ref} className="shell">
-        <div ref={flowRef} className="mb-[clamp(3rem,7vw,5rem)]">
-          <SteadyTrace />
+    <footer className="relative overflow-hidden bg-paper pt-[clamp(3rem,7vw,5rem)] pb-14">
+      {/* A very faint, static corner haze — atmosphere, no motion. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <span
+          className="glow"
+          style={{
+            width: "min(50vw, 560px)",
+            height: "min(30vw, 340px)",
+            bottom: "-14%",
+            right: "-6%",
+            background: "radial-gradient(circle, hsl(var(--peach) / 0.4), transparent 72%)",
+          }}
+        />
+      </div>
+      <div ref={ref} className="relative shell">
+        <div className="rv mb-[clamp(3rem,7vw,5rem)]" aria-hidden="true">
+          <div className="flex items-center gap-4">
+            <span className="h-px flex-1 bg-rule" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-coral shrink-0" />
+            <span className="h-px flex-1 bg-rule" />
+          </div>
         </div>
 
         <div className="grid gap-x-12 gap-y-14 md:grid-cols-12">
           {/* Brand */}
           <div className="md:col-span-5">
             <img
-              src={modoloLogo}
+              src={LOGO_SRC}
               alt="MODOLO AI"
-              width={573}
-              height={401}
+              width={2546}
+              height={1664}
               className="h-14 w-auto mb-7"
             />
             <p className="text-[1.0625rem] text-ink mb-1.5">
-              Medical, Dental &amp; Law Office AI Solutions
+              Medical &amp; Dental Office AI Solutions
             </p>
             <p className="label text-stone-mid mb-9">
               Demand Generation &amp; AI Office Operations
@@ -75,11 +98,32 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Link columns */}
-          <nav className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-12" aria-label="Footer">
+          {/* Link columns — Services (all seven) spans two sub-columns so the
+              longer list stays balanced against Company and Legal. */}
+          <nav
+            className="md:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12"
+            aria-label="Footer"
+          >
+            <div className="col-span-2">
+              <h4 className="label text-ink pb-4 mb-2 border-b border-ink">
+                Services
+              </h4>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                {services.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="block py-2.5 text-[0.9375rem] text-stone-mid hover:text-coral-ink transition-colors duration-300"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             {(
               [
-                ["Solutions", links.solutions],
                 ["Company", links.company],
                 ["Legal", links.legal],
               ] as const
@@ -111,9 +155,9 @@ const Footer = () => {
             © {currentYear} MODOLO.AI All rights reserved.
           </p>
           <p className="label text-stone-mid">
-            Medical, Dental &amp; Law Office AI Solutions
+            Medical &amp; Dental Office AI Solutions
             <span className="text-stone-mid mx-2" aria-hidden="true">/</span>
-            www.aifordp.com
+            www.modolo.ai
           </p>
         </div>
       </div>
